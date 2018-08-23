@@ -132,7 +132,7 @@ def InitFlash(handle, skip_error = False):
     if IsFirmwareRunning(handle):
         raise ValueError("Error - InitFlash(): Firmware running")
 
-    # Start the firmware
+    # Detect the flash
     HBI_write(handle, 0x032, (0x00, 0x0B))
     HBI_write(handle, 0x006, (0x00, 0x01))
     BusySpinWait(handle)

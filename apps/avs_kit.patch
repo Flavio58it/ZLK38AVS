@@ -1,18 +1,6 @@
-diff -Naur cp_avs-device-sdk/ESP/src/DummyESPDataProvider.cpp avs-device-sdk/ESP/src/DummyESPDataProvider.cpp
---- cp_avs-device-sdk/ESP/src/DummyESPDataProvider.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/ESP/src/DummyESPDataProvider.cpp	2018-05-30 15:08:51.000000000 -0500
-@@ -18,7 +18,7 @@
- namespace alexaClientSDK {
- namespace esp {
- 
--DummyESPDataProvider::DummyESPDataProvider() : m_enabled{false} {
-+DummyESPDataProvider::DummyESPDataProvider() : m_enabled{true} {
- }
- 
- capabilityAgents::aip::ESPData DummyESPDataProvider::getESPData() {
 diff -Naur cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt avs-device-sdk/KWD/Sensory/src/CMakeLists.txt
---- cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-05-30 15:12:14.000000000 -0500
+--- cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-06-13 15:52:16.000000000 -0500
 @@ -3,9 +3,16 @@
      SensoryKeywordDetector.cpp)
  
@@ -34,8 +22,8 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt avs-device-sdk/KWD/S
  target_link_libraries(SENSORY KWD AVSCommon "${SENSORY_KEY_WORD_DETECTOR_LIB_PATH}")
  
 diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp
---- cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-05-30 15:11:23.000000000 -0500
+--- cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-06-13 15:52:16.000000000 -0500
 @@ -18,6 +18,7 @@
  #include <AVSCommon/Utils/Logger/Logger.h>
  
@@ -79,7 +67,7 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-devi
               * Note that this does not include the overrun condition, which the base class handles by instructing the
 diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h
 --- cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	2018-03-21 18:14:03.000000000 -0500
++++ avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,48 @@
 +/*
 +* I2cLib.h  --  I2C Wrapper based on the Linux I2C_RDWR IOCTL Header
@@ -129,38 +117,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h avs-device-sdk
 +};
 +
 +#endif
-diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/KeywordObserver.h avs-device-sdk/SampleApp/include/SampleApp/KeywordObserver.h
---- cp_avs-device-sdk/SampleApp/include/SampleApp/KeywordObserver.h	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/include/SampleApp/KeywordObserver.h	2018-05-30 15:50:35.000000000 -0500
-@@ -23,6 +23,7 @@
- #include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
- #include <DefaultClient/DefaultClient.h>
- #include <ESP/ESPDataProviderInterface.h>
-+#include <ESP/ESPDataModifierInterface.h>
- 
- namespace alexaClientSDK {
- namespace sampleApp {
-@@ -42,7 +43,8 @@
-     KeywordObserver(
-         std::shared_ptr<defaultClient::DefaultClient> client,
-         capabilityAgents::aip::AudioProvider audioProvider,
--        std::shared_ptr<esp::ESPDataProviderInterface> espProvider = nullptr);
-+        std::shared_ptr<esp::ESPDataProviderInterface> espProvider = nullptr,
-+        std::shared_ptr<esp::ESPDataModifierInterface> espModifier = nullptr);
- 
-     /// @name KeyWordObserverInterface Functions
-     /// @{
-@@ -63,6 +65,7 @@
- 
-     /// Echo Spatial Perception (ESP) provider.
-     std::shared_ptr<esp::ESPDataProviderInterface> m_espProvider;
-+    std::shared_ptr<esp::ESPDataModifierInterface> m_espModifier;
- };
- 
- }  // namespace sampleApp
 diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h
 --- cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	2018-03-21 18:14:03.000000000 -0500
++++ avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,111 @@
 +/*
 +* LedDriver.h  --  IS31FL3731 Wrapper Header
@@ -275,7 +234,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h avs-device-
 +#endif
 diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h
 --- cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	2018-04-09 16:20:19.000000000 -0500
++++ avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,104 @@
 +/*
 +* Zle38Avs.h  --  ZLE38AVS board Header
@@ -383,8 +342,8 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h avs-device-s
 +#endif
 \ No newline at end of file
 diff -Naur cp_avs-device-sdk/SampleApp/src/CMakeLists.txt avs-device-sdk/SampleApp/src/CMakeLists.txt
---- cp_avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-05-30 15:16:16.000000000 -0500
+--- cp_avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-08-23 10:33:23.000000000 -0500
 @@ -9,7 +9,10 @@
      UIManager.cpp
      UserInputManager.cpp
@@ -425,7 +384,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/CMakeLists.txt avs-device-sdk/SampleA
  if(KWD)
 diff -Naur cp_avs-device-sdk/SampleApp/src/I2cLib.cpp avs-device-sdk/SampleApp/src/I2cLib.cpp
 --- cp_avs-device-sdk/SampleApp/src/I2cLib.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/I2cLib.cpp	2018-03-21 18:14:03.000000000 -0500
++++ avs-device-sdk/SampleApp/src/I2cLib.cpp	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,196 @@
 +/*
 +* I2cLib.cpp  --  I2C Wrapper based on the Linux I2C_RDWR IOCTL Implementation
@@ -623,57 +582,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/I2cLib.cpp avs-device-sdk/SampleApp/s
 +
 +    return retVal;
 +}
-diff -Naur cp_avs-device-sdk/SampleApp/src/KeywordObserver.cpp avs-device-sdk/SampleApp/src/KeywordObserver.cpp
---- cp_avs-device-sdk/SampleApp/src/KeywordObserver.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/KeywordObserver.cpp	2018-05-30 15:59:12.000000000 -0500
-@@ -14,6 +14,7 @@
-  */
- 
- #include "SampleApp/KeywordObserver.h"
-+#include "SampleApp/Zle38Avs.h"
- 
- namespace alexaClientSDK {
- namespace sampleApp {
-@@ -21,10 +22,12 @@
- KeywordObserver::KeywordObserver(
-     std::shared_ptr<defaultClient::DefaultClient> client,
-     capabilityAgents::aip::AudioProvider audioProvider,
--    std::shared_ptr<esp::ESPDataProviderInterface> espProvider) :
-+    std::shared_ptr<esp::ESPDataProviderInterface> espProvider,
-+    std::shared_ptr<esp::ESPDataModifierInterface> espModifier) :
-         m_client{client},
-         m_audioProvider{audioProvider},
--        m_espProvider{espProvider} {
-+        m_espProvider{espProvider},
-+        m_espModifier{espModifier} {
- }
- 
- void KeywordObserver::onKeyWordDetected(
-@@ -33,6 +36,8 @@
-     avsCommon::avs::AudioInputStream::Index beginIndex,
-     avsCommon::avs::AudioInputStream::Index endIndex,
-     std::shared_ptr<const std::vector<char>> KWDMetadata) {
-+    unsigned long voiceEnergy, ambientEnergy;
-+
-     if (endIndex != avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX &&
-         beginIndex == avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX) {
-         if (m_client) {
-@@ -43,6 +48,12 @@
-         beginIndex != avsCommon::sdkInterfaces::KeyWordObserverInterface::UNSPECIFIED_INDEX) {
-         auto espData = capabilityAgents::aip::ESPData::EMPTY_ESP_DATA;
-         if (m_espProvider) {
-+            if (m_espModifier) {
-+                Zle38AvsBoard.ReadESP(&voiceEnergy, &ambientEnergy);
-+                // Set the ESP data values to be sent to the AVS cloud
-+                // m_espModifier->setVoiceEnergy(std::to_string(voiceEnergy));
-+                // m_espModifier->setAmbientEnergy(std::to_string(ambientEnergy));
-+            }
-             espData = m_espProvider->getESPData();
-         }
- 
 diff -Naur cp_avs-device-sdk/SampleApp/src/LedDriver.cpp avs-device-sdk/SampleApp/src/LedDriver.cpp
 --- cp_avs-device-sdk/SampleApp/src/LedDriver.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/LedDriver.cpp	2018-03-21 18:14:03.000000000 -0500
++++ avs-device-sdk/SampleApp/src/LedDriver.cpp	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,380 @@
 +/*
 +* LedDriver.cpp  --  IS31FL3731 Wrapper Implementation
@@ -1056,8 +967,8 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/LedDriver.cpp avs-device-sdk/SampleAp
 +    return out;
 +}
 diff -Naur cp_avs-device-sdk/SampleApp/src/main.cpp avs-device-sdk/SampleApp/src/main.cpp
---- cp_avs-device-sdk/SampleApp/src/main.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/main.cpp	2018-05-30 15:36:16.000000000 -0500
+--- cp_avs-device-sdk/SampleApp/src/main.cpp	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/SampleApp/src/main.cpp	2018-08-23 10:33:24.000000000 -0500
 @@ -18,6 +18,9 @@
  #include <cstdlib>
  #include <string>
@@ -1069,8 +980,8 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/main.cpp avs-device-sdk/SampleApp/src
   * Function that evaluates if the SampleApp invocation uses old-style or new-style opt-arg style invocation.
   *
 diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp
---- cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-05-30 15:39:17.000000000 -0500
+--- cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-08-23 10:33:23.000000000 -0500
 @@ -22,13 +22,14 @@
  #include <AVSCommon/Utils/Logger/Logger.h>
  #include "SampleApp/PortAudioMicrophoneWrapper.h"
@@ -1120,21 +1031,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-de
      if (returnCode <= 0) {
          ACSDK_CRITICAL(LX("Failed to write to stream."));
          return paAbort;
-diff -Naur cp_avs-device-sdk/SampleApp/src/SampleApplication.cpp avs-device-sdk/SampleApp/src/SampleApplication.cpp
---- cp_avs-device-sdk/SampleApp/src/SampleApplication.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/SampleApplication.cpp	2018-05-30 15:43:43.000000000 -0500
-@@ -631,7 +631,7 @@
- 
-     // This observer is notified any time a keyword is detected and notifies the DefaultClient to start recognizing.
-     auto keywordObserver =
--        std::make_shared<alexaClientSDK::sampleApp::KeywordObserver>(client, wakeWordAudioProvider, espProvider);
-+        std::make_shared<alexaClientSDK::sampleApp::KeywordObserver>(client, wakeWordAudioProvider, espProvider, espModifier);
- 
-     m_keywordDetector = alexaClientSDK::kwd::KeywordDetectorProvider::create(
-         sharedDataStream,
 diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleApp/src/UIManager.cpp
---- cp_avs-device-sdk/SampleApp/src/UIManager.cpp	2018-05-04 17:45:54.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/UIManager.cpp	2018-06-13 15:03:39.000000000 -0500
+--- cp_avs-device-sdk/SampleApp/src/UIManager.cpp	2018-07-09 16:08:43.000000000 -0500
++++ avs-device-sdk/SampleApp/src/UIManager.cpp	2018-08-23 10:33:00.000000000 -0500
 @@ -23,6 +23,8 @@
  
  #include "SampleApp/ConsolePrinter.h"
@@ -1144,7 +1043,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleAp
  namespace alexaClientSDK {
  namespace sampleApp {
  
-@@ -406,20 +408,33 @@
+@@ -407,20 +409,33 @@
      if (m_connectionStatus == avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED) {
          ConsolePrinter::prettyPrint("Client not connected!");
      } else if (m_connectionStatus == avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::PENDING) {
@@ -1180,7 +1079,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleAp
              /*
 diff -Naur cp_avs-device-sdk/SampleApp/src/Zle38Avs.cpp avs-device-sdk/SampleApp/src/Zle38Avs.cpp
 --- cp_avs-device-sdk/SampleApp/src/Zle38Avs.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/Zle38Avs.cpp	2018-06-13 15:29:52.000000000 -0500
++++ avs-device-sdk/SampleApp/src/Zle38Avs.cpp	2018-08-23 10:33:24.000000000 -0500
 @@ -0,0 +1,527 @@
 +/*
 +* Zle38Avs.cpp  --  ZLE38AVS board Implementation

@@ -34,7 +34,7 @@ AMAZON_AVS_ONLINE_REPOSITORY =https://github.com/alexa/avs-device-sdk
 SENSORY_ALEXA_ONLINE_REPOSITORY =https://github.com/Sensory/alexa-rpi
 AMAZON_AVS_LOCAL_DIR ?=$(ROOTDIR)/../amazon_avs_cpp
 AMAZON_AVS_JSON_CONFIG =$(AMAZON_AVS_LOCAL_DIR)/sdk-build/Integration/AlexaClientSDKConfig.json
-AMAZON_AVS_SDK_REL=v1.7.1.tar.gz
+AMAZON_AVS_SDK_REL=v1.8.1.tar.gz
 
 HOST_PI_IMAGE_VER :=`cat /etc/os-release`
 HOST_KHEADERS_DIR =/lib/modules/`uname -r`/build

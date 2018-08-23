@@ -34,7 +34,8 @@ from array import array
 IMG_HDR_VERSION = 0
 IMG_HDR_FIRMWARE = 0
 IMG_HDR_CONFIG = 0x40
-HBI_MAX_PAGE_LEN = 256
+HBI_MAX_PAGE_LEN_FW = 256
+HBI_MAX_PAGE_LEN_CR = 128
 
 # Globals
 page_select = True
@@ -130,6 +131,12 @@ def FormatSegmentToHbi(segment_list, start_address, block_size_words, isConfig =
     global page_select
     global left_over_bytes
 
+    # Page size depends if the registers are accessed via page 255 (256) or regular pages (128)
+    if isConfig:
+        pageSize = HBI_MAX_PAGE_LEN_CR
+    else:
+        pageSize = HBI_MAX_PAGE_LEN_FW
+
     # Initial data
     addr = start_address
     seg_len_bytes = len(segment_list)
@@ -146,7 +153,7 @@ def FormatSegmentToHbi(segment_list, start_address, block_size_words, isConfig =
     while (seg_index < seg_len_bytes):
         # HBI block with start address
         if (rem_page_bytes == 0):
-            rem_page_bytes = HBI_MAX_PAGE_LEN * 2
+            rem_page_bytes = pageSize * 2
 
             if isConfig:
                 # Regular paged access
@@ -250,7 +257,7 @@ def FormatSegmentToHbi(segment_list, start_address, block_size_words, isConfig =
 
             # Update the indexes and current address
             seg_index += continue_bytes
-            rem_page_bytes = HBI_MAX_PAGE_LEN * 2
+            rem_page_bytes = pageSize * 2
             addr += continue_bytes
 
             # Space left accounting for the 2 bytes of HBI control
@@ -320,7 +327,7 @@ def FormatSegmentToHbi(segment_list, start_address, block_size_words, isConfig =
 # ****************************************************************************
 def FormatS7ToHbi(buffer_list, block_size):
 
-    # Parse the S3 file in reverse order as the S7 record is usualy at the end
+    # Parse the S3 file in reverse order as the S7 record is usually at the end
     for line in reversed(buffer_list):
         if (line[0: 2].lower() == "s7"):
             split_line = re.findall(r"[0-9a-fA-F]{2}", line[2:])

@@ -68,7 +68,7 @@ swig:
 
 help:
 	@echo "----------------------------------------------------------------------------------------"
-	@echo "| Microsemi AVS Kit software version 2.5.0                                             |"
+	@echo "| Microsemi AVS Kit software version 2.6.0                                             |"
 	@echo "----------------------------------------------------------------------------------------"
 	@echo "| SHELL="$(SHELL)
 	@echo "| ROOTDIR="$(ROOTDIR)
