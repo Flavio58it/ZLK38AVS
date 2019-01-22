@@ -31,8 +31,11 @@
 #     Note: Firmware has to be stopped
 #
 # LoadFirmware(handle, firmware_buf)
-#     Load a .bin firmware image
+#     Load a .bin/.hbi firmware image
 #     Note: Firmware has to be stopped
+#
+# LoadConfig(handle, config_buf)
+#     Load a .bin/.hbi configuration image
 #
 # LoadConfigCr2(handle, config_record_buf)
 #     Load a .cr2 configuration record
@@ -238,6 +241,43 @@ def LoadFirmware(handle, firmware_buf):
         print("Info - Firmware successfully loaded")
 
 # ****************************************************************************
+def LoadConfig(handle, config_buf):
+    global programmatic
+
+    # Get the configuration info
+    data = hbi_data_t()
+    data.size = len(config_buf)
+    data.pData = config_buf
+    header = hbi_img_hdr_t()
+    status = HBI_get_header(data, header)
+
+    if (status != HBI_STATUS_SUCCESS):
+        raise ValueError("Error - LoadConfig(): Invalid Image Header Found (%d)" % status)
+
+    # Strip the configuration header
+    config_buf = config_buf[header.hdr_len : header.hdr_len + header.img_len]
+
+    # Convert the block size in bytes (from 16b words)
+    block_size = header.block_size * 2
+
+    # Send the configuration "block_size" at a time
+    image_len = header.img_len
+    block_num = image_len // block_size
+    if ((image_len % block_size) != 0):
+        raise ValueError("Error - LoadConfig(): The configuration size is not a multiple of block_size")
+
+    for i in range(0, block_num):
+        offset = i * block_size
+        data.pData = config_buf[offset : offset + block_size]
+        data.size = block_size
+        status = HBI_set_command(handle, HBI_CMD_LOAD_CFGREC_FROM_HOST, data)
+        if (status != HBI_STATUS_SUCCESS):
+            raise ValueError("Error - LoadConfig(): Configuration loading issue (%d)" % status)
+
+    if not programmatic:
+        print("Info - Configuration successfully loaded")
+
+# ****************************************************************************
 def LoadConfigCr2(handle, config_record_buf):
     global programmatic
 
@@ -359,16 +399,17 @@ once the configuration is loaded.
 Firmware and configuration can also be loaded from flash if available.
 
 ex: Erase the flash, load a new firmware and configuration, save to flash:
-    %s -e -f ZLS38040_firmware.bin -c ZLS38040_config.cr2 -s
+    %s -e -f ZLS38040_firmware.bin -cr2 ZLS38040_config.cr2 -s
 ex: Load a configuration at runtime and save it with the firmware stored in
     flash slot 2:
-    %s -c ZLS38040_config.cr2 -s -i 2
+    %s -cr2 ZLS38040_config.cr2 -s -i 2
 ex: Load a firmware and configuration from flash slot 3:
     %s -l 3
 """ % (sys.argv[0], sys.argv[0], sys.argv[0])))
     parser.add_argument("-e", "--eraseFlash", help = "erase the flash", action = "store_true")
-    parser.add_argument("-f", "--firmwarePath", help = "firmware image path (*.bin)")
-    parser.add_argument("-c", "--configPath", help = "configuration record path (*.cr2)")
+    parser.add_argument("-f", "--firmwarePath", help = "firmware image path (*.bin/*.hbi)")
+    parser.add_argument("-cr2", "--configPathCr2", help = "configuration record path (*.cr2)")
+    parser.add_argument("-cbin", "--configPathBin", help = "configuration record path (*.bin/*.hbi)")
     parser.add_argument("-s", "--saveToFlash", help = "save the firmware and/or configuration to flash", action = "store_true")
     parser.add_argument("-i", "--indexSlot", help = "flash slot index when saving the configuration at run time (default = 1)", type = int, default = 1)
     parser.add_argument("-l", "--loadFromFlash", help = "load the firmware and configuration associated with the specified index", type = int)
@@ -392,8 +433,16 @@ ex: Load a firmware and configuration from flash slot 3:
         firmware_buf = ""
 
     # Parse the configuration record file
-    if ((args.configPath != None) and isfile(args.configPath)):
-        config_record_buf = ParseCr2File(args.configPath)
+    if ((args.configPathCr2 != None) and isfile(args.configPathCr2)):
+        filename, file_extension = os.path.splitext(args.configPathCr2)
+        if (file_extension.lower() != ".cr2"):
+            raise ValueError("Error - Main(): Incompatible configuration extension (%s)" % file_extension)
+        config_record_buf = ParseCr2File(args.configPathCr2)
+    elif ((args.configPathBin != None) and isfile(args.configPathBin)):
+        filename, file_extension = os.path.splitext(args.configPathBin)
+        if ((file_extension.lower() != ".bin") and (file_extension.lower() != ".hbi")):
+            raise ValueError("Error - Main(): Incompatible configuration extension (%s)" % file_extension)
+        config_record_buf = ParseBinFile(args.configPathBin)
     else:
         config_record_buf = ""
 
@@ -441,11 +490,11 @@ ex: Load a firmware and configuration from flash slot 3:
         if (config_record_buf != ""):
             # Load the configuration record
             if (config_record_buf != ""):
-                filename, file_extension = os.path.splitext(args.configPath)
                 if (file_extension.lower() == ".cr2"):
                     LoadConfigCr2(handle, config_record_buf)
                 else:
-                    raise ValueError("Error - Main(): Unknown configuration extension (%s)" % file_extension)
+                    # bin or hbi format
+                    LoadConfig(handle, config_record_buf)
 
                 # Soft reset required if loading a config at run time (doesn't hurt even if the config was not loaded)
                 if fw_running:

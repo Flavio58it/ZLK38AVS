@@ -183,12 +183,14 @@ def ParseCmd(handle, header, cmd):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Raspberry Pi socket server for MiTuner V1.0.0")
     parser.add_argument("-d", "--debug", help = "debug level 0: none, 1: in, 2: out, 3: in/out", type = int, default = 0)
+    parser.add_argument("-cs", "--chipSelect", help = "SPI chip select (default = 0)", type = int, default = 0)
 
     # Parse the input arguments
     args = parser.parse_args()
 
     # Init the HBI driver
-    cfg = hbi_dev_cfg_t();
+    cfg = hbi_dev_cfg_t()
+    cfg.deviceId = args.chipSelect
     handle = HBI_open(cfg)
 
     try:

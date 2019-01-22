@@ -32,9 +32,11 @@ export platformGroup :=`id -gn`
 
 AMAZON_AVS_ONLINE_REPOSITORY =https://github.com/alexa/avs-device-sdk
 SENSORY_ALEXA_ONLINE_REPOSITORY =https://github.com/Sensory/alexa-rpi
-AMAZON_AVS_LOCAL_DIR ?=$(ROOTDIR)/../amazon_avs_cpp
+AMAZON_AVS_LOCAL_DIR ?=$(ROOTDIR)/../../Amazon_AVS
+SENSORY_KWD_LOCAL_DIR ?=$(ROOTDIR)/../../Sensory_KWD
+PORTAUDIO_LOCAL_DIR ?=$(ROOTDIR)/../../Portaudio
 AMAZON_AVS_JSON_CONFIG =$(AMAZON_AVS_LOCAL_DIR)/sdk-build/Integration/AlexaClientSDKConfig.json
-AMAZON_AVS_SDK_REL=v1.8.1.tar.gz
+AMAZON_AVS_SDK_REL=v1.11.tar.gz
 
 HOST_PI_IMAGE_VER :=`cat /etc/os-release`
 HOST_KHEADERS_DIR =/lib/modules/`uname -r`/build
@@ -70,6 +72,8 @@ MSCC_TW_CONFIG_SELECT =$(MSCC_APPS_FWLD) $(MSCC_TW_CONFIG_SELECT_IDX)
 .PHONY: pi_kheaders avs_git alexa_install pi_ksrc ksrc_msg_st ksrc_msg_end pi_kheaders_check pi_vercheck pi_kheaders_install
 
 ksrc_msg_st:
+	@echo
+	@echo
 	@echo "--*********************************************************************************--"
 	@echo "--*********************************************************************************--"
 	@echo "-- Downloading and installing The kernel $(KSRC_TARBALL_NAME)                      --"
@@ -77,8 +81,11 @@ ksrc_msg_st:
 	@echo "-- Once completed the platform will be configured to boot with the new kernel      --"
 	@echo "--*********************************************************************************--"
 	@echo "--*********************************************************************************--"
+	@echo
 
 ksrc_msg_end:
+	@echo
+	@echo
 	@echo "--*********************************************************************************--"
 	@echo "--*********************************************************************************--"
 	@echo "-- Kernel $(KSRC_TARBALL_NAME) installation completed successfully                 --"
@@ -86,6 +93,7 @@ ksrc_msg_end:
 	@echo "--                                                                                 --"
 	@echo "--*********************************************************************************--"
 	@echo "--*********************************************************************************--"
+	@echo
 
 
 pi_ksrc:
@@ -300,53 +308,61 @@ enable_autostart:
 set_serial:
 	@serial=`cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2`; \
 	echo "Updated AVS serial number to: $$serial" ; \
-	jq '.authDelegate.deviceSerialNumber="'$$serial'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG)
+	jq '.deviceInfo.deviceSerialNumber="'$$serial'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG)
 
 alexa_install:
-	@echo "--*********************************************************************************--"
-	@echo "--*********************************************************************************--"
-	@echo "-- Downloading and installing Amazon Alexa Make sure you have the Amazon developer --"
-	@echo "-- account/product info needed to install the alexa sample app                     --"
-	@echo "--                                                                                 --"
-	@echo "-- Note: Run this Makefile from the Raspberry Pi Desktop environement as the last  --"
-	@echo "-- step requires Chromium to run on the Raspberry Pi                               --"
-	@echo "--*********************************************************************************--"
-	@echo "--*********************************************************************************--"
+	@echo
+	@echo
+	@echo "--*************************************************************************************--"
+	@echo "--*************************************************************************************--"
+	@echo "-- Downloading and/or installing Amazon Alexa, make sure you have the Amazon developer --"
+	@echo "-- account/product info needed to install the alexa sample app                         --"
+	@echo "--*************************************************************************************--"
+	@echo "--*************************************************************************************--"
+	@echo
+
+# Accept the licence agreements
+	@bash lic.sh
 
 # Install all the required packages
 # Get the specified tag of the  Alexa C++ sample app and add the custom code via a patch (LED, WW feedback, Dual Stream, ESP)
 	@if [ ! -d  $(AMAZON_AVS_LOCAL_DIR) ]; then \
 	    sudo apt-get update; \
-	    sudo apt-get -y install git gcc cmake build-essential libsqlite3-dev libcurl4-openssl-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev sox doxygen jq moreutils; \
+	    sudo apt-get -y install git gcc cmake build-essential libsqlite3-dev libcurl4-openssl-dev libssl1.0-dev libfaad-dev libsoup2.4-dev libgcrypt20-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-good libasound2-dev sox gedit vim python3-pip doxygen jq moreutils swig; \
 	    sudo pip install flask commentjson; \
-	    mkdir $(AMAZON_AVS_LOCAL_DIR) $(AMAZON_AVS_LOCAL_DIR)/sdk-source $(AMAZON_AVS_LOCAL_DIR)/third-party; \
+	    mkdir $(AMAZON_AVS_LOCAL_DIR) $(AMAZON_AVS_LOCAL_DIR)/sdk-source $(AMAZON_AVS_LOCAL_DIR)/application-necessities; \
+	    cd $(AMAZON_AVS_LOCAL_DIR)/application-necessities; \
+	    wget https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-voice-service/docs/audio/states/med_system_alerts_melodic_01_short._TTH_.wav; \
 	    cd $(AMAZON_AVS_LOCAL_DIR)/sdk-source; \
-	    mkdir avs-device-sdk; \
+	    mkdir org-avs-device-sdk patched-avs-device-sdk; \
 	    wget https://github.com/alexa/avs-device-sdk/archive/$(AMAZON_AVS_SDK_REL); \
-	    tar -xf $(AMAZON_AVS_SDK_REL) -C avs-device-sdk --strip-components 1; \
+	    tar -xf $(AMAZON_AVS_SDK_REL) -C org-avs-device-sdk --strip-components 1; \
+	    tar -xf $(AMAZON_AVS_SDK_REL) -C patched-avs-device-sdk --strip-components 1; \
 	    rm $(AMAZON_AVS_SDK_REL); \
-	    cd avs-device-sdk; \
+	    cd patched-avs-device-sdk; \
 	    patch -p1 < $(MSCC_LOCAL_APPS_PATH)/avs_kit.patch; \
 	fi
 
 # Install Portaudio
-	@if [ ! -d  $(AMAZON_AVS_LOCAL_DIR)/third-party/portaudio ]; then \
-	    cd $(AMAZON_AVS_LOCAL_DIR)/third-party; \
+	@if [ ! -d  $(PORTAUDIO_LOCAL_DIR) ]; then \
+	    mkdir $(PORTAUDIO_LOCAL_DIR); \
+	    cd $(PORTAUDIO_LOCAL_DIR); \
 	    wget -c http://www.portaudio.com/archives/pa_stable_v190600_20161030.tgz; \
-	    tar zxf pa_stable_v190600_20161030.tgz; \
-	    cd portaudio; \
+	    tar zxf pa_stable_v190600_20161030.tgz --strip-components 1; \
 	    ./configure --without-jack; \
 	    make; \
+	    touch $(ROOTDIR)/../\.build; \
 	fi
 
 # Install Sensory
-	@if [ ! -d  $(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi ]; then \
-	    cd $(AMAZON_AVS_LOCAL_DIR)/third-party; \
+	@if [ ! -d  $(SENSORY_KWD_LOCAL_DIR)/alexa-rpi ]; then \
+	    mkdir $(SENSORY_KWD_LOCAL_DIR); \
+	    cd $(SENSORY_KWD_LOCAL_DIR); \
 	    git clone $(SENSORY_ALEXA_ONLINE_REPOSITORY); \
 	    rm -f alexa-rpi/models/*.*; \
-	    cp ../../apps/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-20500.snsr; \
-	    cp ../../apps/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-21000.snsr; \
-	    cp ../../apps/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-31000.snsr; \
+	    cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-20500.snsr; \
+	    cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-21000.snsr; \
+	    cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib alexa-rpi/models/spot-alexa-rpi-31000.snsr; \
 	    cd alexa-rpi/bin; \
 	    echo; \
 	    echo; \
@@ -355,22 +371,23 @@ alexa_install:
 	    echo "--****************************************************************************--"; \
 	    echo; \
 	    ./license.sh; \
-	    sed -i "s/SNSR_OPERATING_POINT, [0-9]\+/SNSR_OPERATING_POINT, $(SENSORY_SEARCH_ORDER)/g" $(AMAZON_AVS_LOCAL_DIR)/sdk-source/avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp; \
+	    sed -i "s/SNSR_OPERATING_POINT, [0-9]\+/SNSR_OPERATING_POINT, $(SENSORY_SEARCH_ORDER)/g" $(AMAZON_AVS_LOCAL_DIR)/sdk-source/patched-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp; \
+	    touch $(ROOTDIR)/../\.build; \
 	fi
 
 # Build the Alexa sample app
 	@if [ ! -d  $(AMAZON_AVS_LOCAL_DIR)/sdk-build ]; then \
 	    mkdir $(AMAZON_AVS_LOCAL_DIR)/sdk-build; \
 	    cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build; \
-	    cmake $(AMAZON_AVS_LOCAL_DIR)/sdk-source/avs-device-sdk -DSENSORY_KEY_WORD_DETECTOR=ON -DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=$(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi/lib/libsnsr.a -DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=$(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi/include -DGSTREAMER_MEDIA_PLAYER=ON -DPORTAUDIO=ON -DPORTAUDIO_LIB_PATH=$(AMAZON_AVS_LOCAL_DIR)/third-party/portaudio/lib/.libs/libportaudio.a -DPORTAUDIO_INCLUDE_DIR=$(AMAZON_AVS_LOCAL_DIR)/third-party/portaudio/include -DCMAKE_BUILD_TYPE=DEBUG; \
-	    make SampleApp -j2; \
+	    cmake $(AMAZON_AVS_LOCAL_DIR)/sdk-source/patched-avs-device-sdk -DSENSORY_KEY_WORD_DETECTOR=ON -DSENSORY_KEY_WORD_DETECTOR_LIB_PATH=$(SENSORY_KWD_LOCAL_DIR)/alexa-rpi/lib/libsnsr.a -DSENSORY_KEY_WORD_DETECTOR_INCLUDE_DIR=$(SENSORY_KWD_LOCAL_DIR)/alexa-rpi/include -DGSTREAMER_MEDIA_PLAYER=ON -DPORTAUDIO=ON -DPORTAUDIO_LIB_PATH=$(PORTAUDIO_LOCAL_DIR)/lib/.libs/libportaudio.a -DPORTAUDIO_INCLUDE_DIR=$(PORTAUDIO_LOCAL_DIR)/include -DMICROSEMI_SDK_DIR=$(ROOTDIR) -DCMAKE_BUILD_TYPE=DEBUG; \
+	    touch $(ROOTDIR)/../\.build; \
 	fi
 
-# Create a folder to store the db files
-	@if [ ! -d  $(AMAZON_AVS_LOCAL_DIR)/application-necessities ]; then \
-	    mkdir $(AMAZON_AVS_LOCAL_DIR)/application-necessities; \
-	    cd $(AMAZON_AVS_LOCAL_DIR)/application-necessities; \
-	    wget https://images-na.ssl-images-amazon.com/images/G/01/mobile-apps/dex/alexa/alexa-voice-service/docs/audio/states/med_system_alerts_melodic_01_short._TTH_.wav; \
+# Build the Alexa SDK
+	@if [ -f $(ROOTDIR)/../\.build ]; then \
+	    cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build; \
+	    make SampleApp -j2; \
+	    rm -f $(ROOTDIR)/../\.build; \
 	fi
 
 # Prompt the user for the Amazon tokens and update the Alexa JSON file
@@ -389,6 +406,7 @@ alexa_install:
 	alertsDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/alerts.db; \
 	settingsDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/settings.db; \
 	bluetoothDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/bluetooth.db; \
+	deviceSettingsDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/deviceSettings.db; \
 	certifDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/certifiedSender.db; \
 	notifDB=$(AMAZON_AVS_LOCAL_DIR)/application-necessities/notifications.db; \
 	cat $(AMAZON_AVS_JSON_CONFIG)|grep -v '\s*//'|sponge $(AMAZON_AVS_JSON_CONFIG); \
@@ -401,6 +419,7 @@ alexa_install:
 	jq '.settings.databaseFilePath="'$$settingsDB'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
 	jq '.settings.defaultAVSClientSettings.locale="en-US"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
 	jq '.bluetooth.databaseFilePath="'$$bluetoothDB'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
+	jq '.deviceSettings.databaseFilePath="'$$deviceSettingsDB'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
 	jq '.certifiedSender.databaseFilePath="'$$certifDB'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
 	jq '.notifications.databaseFilePath="'$$notifDB'"' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
 	jq '.gstreamerMediaPlayer.outputConversion.rate=48000' $(AMAZON_AVS_JSON_CONFIG)|sponge $(AMAZON_AVS_JSON_CONFIG); \
@@ -423,13 +442,11 @@ alexa_install:
 	@echo "--****************************************************************************--"
 	@echo
 
-# make sure the default sound card is always the microsemi card
+# make sure the default sound card is always the Microsemi card
 .PHONY: samba_sh soundcfg update_sensory
 
 soundcfg:
-	@echo "--****************************************************************************--"
-	@echo "--           Configuring the host ALSA related sound configuration            --"
-	@echo "--****************************************************************************--"
+	@echo "Configuring the host ALSA related sound configuration"
 	@if [ -f $(HOST_USER_HOME_DIR)/.asoundrc.backup ]; then \
 	    exit 0; \
 	fi
@@ -467,13 +484,13 @@ samba:
 
 # Update the Sensory license
 update_sensory:
-	@cd $(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi; \
+	@cd $(SENSORY_KWD_LOCAL_DIR)/alexa-rpi; \
 	git reset --hard; \
 	git pull; \
 	rm -f models/*.*; \
-	cp ../../../apps/mscc_gr.lib models/spot-alexa-rpi-20500.snsr; \
-	cp ../../../apps/mscc_gr.lib models/spot-alexa-rpi-21000.snsr; \
-	cp ../../../apps/mscc_gr.lib models/spot-alexa-rpi-31000.snsr; \
+	cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib models/spot-alexa-rpi-20500.snsr; \
+	cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib models/spot-alexa-rpi-21000.snsr; \
+	cp $(MSCC_LOCAL_APPS_PATH)/mscc_gr.lib models/spot-alexa-rpi-31000.snsr; \
 	cd bin; \
 	echo; \
 	echo; \
@@ -482,7 +499,7 @@ update_sensory:
 	echo "--****************************************************************************--"; \
 	echo; \
 	./license.sh
-	@sed -i "s/SNSR_OPERATING_POINT, [0-9]\+/SNSR_OPERATING_POINT, $(SENSORY_SEARCH_ORDER)/g" $(AMAZON_AVS_LOCAL_DIR)/sdk-source/avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp
+	@sed -i "s/SNSR_OPERATING_POINT, [0-9]\+/SNSR_OPERATING_POINT, $(SENSORY_SEARCH_ORDER)/g" $(AMAZON_AVS_LOCAL_DIR)/sdk-source/patched-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp
 	@cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build; \
 	make SampleApp -j2
 
@@ -499,10 +516,10 @@ message:
 # Start the sample app in a separate terminal
 alexa_xterm:
 	@sudo cp /etc/asound.conf $(HOST_USER_HOME_DIR)/.asoundrc
-	@xterm -hold -e 'bash -c "cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build/SampleApp/src/; ./SampleApp $(AMAZON_AVS_JSON_CONFIG) $(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi/models; bash"' &
+	@xterm -hold -e 'bash -c "cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build/SampleApp/src/; ./SampleApp $(AMAZON_AVS_JSON_CONFIG) $(SENSORY_KWD_LOCAL_DIR)/alexa-rpi/models; bash"' &
 
 # Start the sample app in the same terminal
 alexa_exec:
 	@sudo cp /etc/asound.conf $(HOST_USER_HOME_DIR)/.asoundrc
 	@cd $(AMAZON_AVS_LOCAL_DIR)/sdk-build/SampleApp/src/; \
-	./SampleApp $(AMAZON_AVS_JSON_CONFIG) $(AMAZON_AVS_LOCAL_DIR)/third-party/alexa-rpi/models
+	./SampleApp $(AMAZON_AVS_JSON_CONFIG) $(SENSORY_KWD_LOCAL_DIR)/alexa-rpi/models

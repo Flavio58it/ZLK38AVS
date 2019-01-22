@@ -1,7 +1,11 @@
-diff -Naur cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt avs-device-sdk/KWD/Sensory/src/CMakeLists.txt
---- cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-06-13 15:52:16.000000000 -0500
-@@ -3,9 +3,16 @@
+diff -Naur org-avs-device-sdk/KWD/Sensory/src/CMakeLists.txt patched-avs-device-sdk/KWD/Sensory/src/CMakeLists.txt
+--- org-avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/KWD/Sensory/src/CMakeLists.txt	2019-01-21 13:11:34.000000000 -0600
+@@ -1,11 +1,20 @@
++# Modified by Microsemi, a Microchip subsidiary corporation
++
+ add_definitions("-DACSDK_LOG_MODULE=sensoryKeywordDetector")
+ add_library(SENSORY SHARED
      SensoryKeywordDetector.cpp)
  
  target_include_directories(SENSORY PUBLIC
@@ -14,17 +18,26 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/CMakeLists.txt avs-device-sdk/KWD/S
 +
 +include_directories(
 +    "${CMAKE_SOURCE_DIR}/SampleApp/include"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/drivers/hbi/inc"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/include"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/platform/raspberry/include"
++    "${MICROSEMI_SDK_DIR}/drivers/hbi/inc"
++    "${MICROSEMI_SDK_DIR}/include"
++    "${MICROSEMI_SDK_DIR}/platform/raspberry/include"
 +)
  
  target_link_libraries(SENSORY KWD AVSCommon "${SENSORY_KEY_WORD_DETECTOR_LIB_PATH}")
  
-diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp
---- cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-06-13 15:52:16.000000000 -0500
-@@ -18,6 +18,7 @@
+diff -Naur org-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp patched-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp
+--- org-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp	2019-01-21 12:20:36.344131640 -0600
+@@ -11,6 +11,8 @@
+  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  * express or implied. See the License for the specific language governing
+  * permissions and limitations under the License.
++ *
++ * Modified by Microsemi, a Microchip subsidiary corporation.
+  */
+ 
+ #include <memory>
+@@ -18,6 +20,7 @@
  #include <AVSCommon/Utils/Logger/Logger.h>
  
  #include "Sensory/SensoryKeywordDetector.h"
@@ -32,7 +45,7 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-devi
  
  namespace alexaClientSDK {
  namespace kwd {
-@@ -264,6 +265,13 @@
+@@ -264,6 +267,13 @@
          return false;
      }
  
@@ -46,7 +59,7 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-devi
      if (!setUpRuntimeSettings(&m_session)) {
          return false;
      }
-@@ -311,6 +319,7 @@
+@@ -311,6 +321,7 @@
      std::vector<int16_t> audioDataToPush(m_maxSamplesPerPush);
      ssize_t wordsRead;
      SnsrRC result;
@@ -54,7 +67,7 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-devi
      while (!m_isShuttingDown) {
          bool didErrorOccur = false;
          wordsRead = readFromStream(
-@@ -320,6 +329,10 @@
+@@ -320,6 +331,10 @@
              audioDataToPush.size(),
              TIMEOUT_FOR_READ_CALLS,
              &didErrorOccur);
@@ -65,9 +78,9 @@ diff -Naur cp_avs-device-sdk/KWD/Sensory/src/SensoryKeywordDetector.cpp avs-devi
          if (didErrorOccur) {
              /*
               * Note that this does not include the overrun condition, which the base class handles by instructing the
-diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h
---- cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h patched-avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h
+--- org-avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h	2019-01-21 12:15:50.981292724 -0600
 @@ -0,0 +1,48 @@
 +/*
 +* I2cLib.h  --  I2C Wrapper based on the Linux I2C_RDWR IOCTL Header
@@ -117,9 +130,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/I2cLib.h avs-device-sdk
 +};
 +
 +#endif
-diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h
---- cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h patched-avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h
+--- org-avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h	2019-01-21 12:15:50.981292724 -0600
 @@ -0,0 +1,111 @@
 +/*
 +* LedDriver.h  --  IS31FL3731 Wrapper Header
@@ -232,9 +245,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/LedDriver.h avs-device-
 +};
 +
 +#endif
-diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h
---- cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h patched-avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h
+--- org-avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h	2019-01-21 12:15:50.981292724 -0600
 @@ -0,0 +1,104 @@
 +/*
 +* Zle38Avs.h  --  ZLE38AVS board Header
@@ -341,50 +354,55 @@ diff -Naur cp_avs-device-sdk/SampleApp/include/SampleApp/Zle38Avs.h avs-device-s
 +
 +#endif
 \ No newline at end of file
-diff -Naur cp_avs-device-sdk/SampleApp/src/CMakeLists.txt avs-device-sdk/SampleApp/src/CMakeLists.txt
---- cp_avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-08-23 10:33:23.000000000 -0500
-@@ -9,7 +9,10 @@
-     UIManager.cpp
+diff -Naur org-avs-device-sdk/SampleApp/src/CMakeLists.txt patched-avs-device-sdk/SampleApp/src/CMakeLists.txt
+--- org-avs-device-sdk/SampleApp/src/CMakeLists.txt	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/CMakeLists.txt	2019-01-21 13:10:52.000000000 -0600
+@@ -1,3 +1,5 @@
++# Modified by Microsemi, a Microchip subsidiary corporation
++
+ set(SampleApp_SOURCES)
+ list(APPEND SampleApp_SOURCES 
+     ConnectionObserver.cpp
+@@ -10,7 +12,10 @@
      UserInputManager.cpp
      SampleApplication.cpp
+     SampleEqualizerModeController.cpp
 -    main.cpp)
 +    main.cpp
 +    I2cLib.cpp
 +    LedDriver.cpp
 +    Zle38Avs.cpp)
  
- IF (HAS_EXTERNAL_MEDIA_PLAYER_ADAPTERS)
-     file(GLOB_RECURSE SRC_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ExternalMediaAdapterRegistration/*.cpp)
-@@ -28,6 +31,17 @@
+ if (PORTAUDIO)
+     list(APPEND SampleApp_SOURCES PortAudioMicrophoneWrapper.cpp)
+@@ -40,12 +45,24 @@
      "${ESP_SOURCE_DIR}/include"
      "${PORTAUDIO_INCLUDE_DIR}")
  
 +include_directories(
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/drivers/hbi/inc"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/include"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/platform/raspberry/include"
++    "${MICROSEMI_SDK_DIR}/drivers/hbi/inc"
++    "${MICROSEMI_SDK_DIR}/include"
++    "${MICROSEMI_SDK_DIR}/platform/raspberry/include"
 +)
 +
 +set(hbi_libs
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/libs/hbi_u.o"
-+    "${CMAKE_SOURCE_DIR}/../../../vproc_sdk/libs/hbi_tw.o"
++    "${MICROSEMI_SDK_DIR}/libs/hbi_u.o"
++    "${MICROSEMI_SDK_DIR}/libs/hbi_tw.o"
 +)
 +
- target_link_libraries(SampleApp 
+ target_link_libraries(SampleApp
      DefaultClient
      CapabilitiesDelegate
-@@ -35,6 +49,7 @@
-     MediaPlayer
+     CBLAuthDelegate
      SQLiteStorage
      ESP
 +    ${hbi_libs}
+     EqualizerImplementations
      "${PORTAUDIO_LIB_PATH}")
  
- if(KWD)
-diff -Naur cp_avs-device-sdk/SampleApp/src/I2cLib.cpp avs-device-sdk/SampleApp/src/I2cLib.cpp
---- cp_avs-device-sdk/SampleApp/src/I2cLib.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/I2cLib.cpp	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/src/I2cLib.cpp patched-avs-device-sdk/SampleApp/src/I2cLib.cpp
+--- org-avs-device-sdk/SampleApp/src/I2cLib.cpp	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/I2cLib.cpp	2019-01-21 12:15:50.981292724 -0600
 @@ -0,0 +1,196 @@
 +/*
 +* I2cLib.cpp  --  I2C Wrapper based on the Linux I2C_RDWR IOCTL Implementation
@@ -582,9 +600,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/I2cLib.cpp avs-device-sdk/SampleApp/s
 +
 +    return retVal;
 +}
-diff -Naur cp_avs-device-sdk/SampleApp/src/LedDriver.cpp avs-device-sdk/SampleApp/src/LedDriver.cpp
---- cp_avs-device-sdk/SampleApp/src/LedDriver.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/LedDriver.cpp	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/src/LedDriver.cpp patched-avs-device-sdk/SampleApp/src/LedDriver.cpp
+--- org-avs-device-sdk/SampleApp/src/LedDriver.cpp	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/LedDriver.cpp	2019-01-21 12:15:50.991292859 -0600
 @@ -0,0 +1,380 @@
 +/*
 +* LedDriver.cpp  --  IS31FL3731 Wrapper Implementation
@@ -966,23 +984,41 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/LedDriver.cpp avs-device-sdk/SampleAp
 +
 +    return out;
 +}
-diff -Naur cp_avs-device-sdk/SampleApp/src/main.cpp avs-device-sdk/SampleApp/src/main.cpp
---- cp_avs-device-sdk/SampleApp/src/main.cpp	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/main.cpp	2018-08-23 10:33:24.000000000 -0500
-@@ -18,6 +18,9 @@
+diff -Naur org-avs-device-sdk/SampleApp/src/main.cpp patched-avs-device-sdk/SampleApp/src/main.cpp
+--- org-avs-device-sdk/SampleApp/src/main.cpp	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/main.cpp	2019-01-21 12:15:50.991292859 -0600
+@@ -11,6 +11,8 @@
+  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  * express or implied. See the License for the specific language governing
+  * permissions and limitations under the License.
++ *
++ * Modified by Microsemi, a Microchip subsidiary corporation.
+  */
+ 
+ #include "SampleApp/ConsoleReader.h"
+@@ -20,6 +22,9 @@
  #include <cstdlib>
  #include <string>
  
 +#include "SampleApp/Zle38Avs.h"
 +Zle38Avs Zle38AvsBoard;
 +
+ using namespace alexaClientSDK::sampleApp;
+ 
  /**
-  * Function that evaluates if the SampleApp invocation uses old-style or new-style opt-arg style invocation.
-  *
-diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp
---- cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-08-23 10:33:23.000000000 -0500
-@@ -22,13 +22,14 @@
+diff -Naur org-avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp patched-avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp
+--- org-avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp	2019-01-21 12:15:50.991292859 -0600
+@@ -11,6 +11,8 @@
+  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  * express or implied. See the License for the specific language governing
+  * permissions and limitations under the License.
++ *
++ * Modified by Microsemi, a Microchip subsidiary corporation.
+  */
+ 
+ #include <cstring>
+@@ -22,13 +24,14 @@
  #include <AVSCommon/Utils/Logger/Logger.h>
  #include "SampleApp/PortAudioMicrophoneWrapper.h"
  #include "SampleApp/ConsolePrinter.h"
@@ -998,7 +1034,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-de
  static const int NUM_OUTPUT_CHANNELS = 0;
  static const double SAMPLE_RATE = 16000;
  static const unsigned long PREFERRED_SAMPLES_PER_CALLBACK = paFramesPerBufferUnspecified;
-@@ -93,7 +94,7 @@
+@@ -93,7 +96,7 @@
              &m_paStream,
              NUM_INPUT_CHANNELS,
              NUM_OUTPUT_CHANNELS,
@@ -1007,7 +1043,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-de
              SAMPLE_RATE,
              PREFERRED_SAMPLES_PER_CALLBACK,
              PortAudioCallback,
-@@ -106,7 +107,7 @@
+@@ -106,7 +109,7 @@
          std::memset(&inputParameters, 0, sizeof(inputParameters));
          inputParameters.device = Pa_GetDefaultInputDevice();
          inputParameters.channelCount = NUM_INPUT_CHANNELS;
@@ -1016,7 +1052,7 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-de
          inputParameters.suggestedLatency = suggestedLatency;
          inputParameters.hostApiSpecificStreamInfo = nullptr;
  
-@@ -155,8 +156,13 @@
+@@ -155,8 +158,13 @@
      const PaStreamCallbackTimeInfo* timeInfo,
      PaStreamCallbackFlags statusFlags,
      void* userData) {
@@ -1031,19 +1067,28 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/PortAudioMicrophoneWrapper.cpp avs-de
      if (returnCode <= 0) {
          ACSDK_CRITICAL(LX("Failed to write to stream."));
          return paAbort;
-diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleApp/src/UIManager.cpp
---- cp_avs-device-sdk/SampleApp/src/UIManager.cpp	2018-07-09 16:08:43.000000000 -0500
-+++ avs-device-sdk/SampleApp/src/UIManager.cpp	2018-08-23 10:33:00.000000000 -0500
-@@ -23,6 +23,8 @@
+diff -Naur org-avs-device-sdk/SampleApp/src/UIManager.cpp patched-avs-device-sdk/SampleApp/src/UIManager.cpp
+--- org-avs-device-sdk/SampleApp/src/UIManager.cpp	2018-12-19 13:13:36.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/UIManager.cpp	2019-01-21 12:15:50.991292859 -0600
+@@ -11,6 +11,8 @@
+  * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+  * express or implied. See the License for the specific language governing
+  * permissions and limitations under the License.
++ *
++ * Modified by Microsemi, a Microchip subsidiary corporation.
+  */
  
+ #include <iostream>
+@@ -25,6 +27,8 @@
  #include "SampleApp/ConsolePrinter.h"
+ #include "Settings/SettingStringConversion.h"
  
 +#include "SampleApp/Zle38Avs.h"
 +
- namespace alexaClientSDK {
- namespace sampleApp {
+ /// String to identify log entries originating from this file.
+ static const std::string TAG("UIManager");
  
-@@ -407,20 +409,33 @@
+@@ -564,22 +568,35 @@
      if (m_connectionStatus == avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED) {
          ConsolePrinter::prettyPrint("Client not connected!");
      } else if (m_connectionStatus == avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::PENDING) {
@@ -1063,13 +1108,15 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleAp
 +                Zle38AvsBoard.StartDoa();
                  ConsolePrinter::prettyPrint("Listening...");
                  return;
+             case DialogUXState::EXPECTING:
+                 ConsolePrinter::prettyPrint("Expecting...");
+                 return;
              case DialogUXState::THINKING:
 +                Zle38AvsBoard.DialogState(2);
 +                Zle38AvsBoard.StopDoa();
 +                Zle38AvsBoard.StartThinking();
                  ConsolePrinter::prettyPrint("Thinking...");
                  return;
-                 ;
              case DialogUXState::SPEAKING:
 +                Zle38AvsBoard.DialogState(3);
 +                Zle38AvsBoard.StopThinking();
@@ -1077,9 +1124,9 @@ diff -Naur cp_avs-device-sdk/SampleApp/src/UIManager.cpp avs-device-sdk/SampleAp
                  ConsolePrinter::prettyPrint("Speaking...");
                  return;
              /*
-diff -Naur cp_avs-device-sdk/SampleApp/src/Zle38Avs.cpp avs-device-sdk/SampleApp/src/Zle38Avs.cpp
---- cp_avs-device-sdk/SampleApp/src/Zle38Avs.cpp	1969-12-31 18:00:00.000000000 -0600
-+++ avs-device-sdk/SampleApp/src/Zle38Avs.cpp	2018-08-23 10:33:24.000000000 -0500
+diff -Naur org-avs-device-sdk/SampleApp/src/Zle38Avs.cpp patched-avs-device-sdk/SampleApp/src/Zle38Avs.cpp
+--- org-avs-device-sdk/SampleApp/src/Zle38Avs.cpp	1969-12-31 18:00:00.000000000 -0600
++++ patched-avs-device-sdk/SampleApp/src/Zle38Avs.cpp	2019-01-21 12:15:51.001292995 -0600
 @@ -0,0 +1,527 @@
 +/*
 +* Zle38Avs.cpp  --  ZLE38AVS board Implementation

@@ -21,7 +21,7 @@ MSCC_DTB_NAMES =$(MSCC_SPI_DTB) $(MSCC_SPIMULTI_DTB) $(MSCC_DAC_OVERLAY_DTB)
 # 3- install the SDK and apps into the host
 # 4- get alexa sample apps and install it
 # 5- configure the ALSA sound card for the host
-all: pi_kheaders vproc_sdk install_sdk alexa_install soundcfg message
+all: pi_kheaders vproc_sdk install_sdk soundcfg alexa_install message
 
 # make command without arguments will run this
 # 1- Download kernel headers and install them if not already done
@@ -49,6 +49,8 @@ start_alexa: alexa_exec
 cleanall: disable_autostart cleanmod_sub cleanov_sub cleansnd_sub cleanprof_sub cleanrc_sub cleanboot_sub
 	rm -rf $(INSTALL_MSCC_LOCAL_LIB_PATH)
 	rm -rf $(AMAZON_AVS_LOCAL_DIR)
+	rm -rf $(SENSORY_KWD_LOCAL_DIR)
+	rm -rf $(PORTAUDIO_LOCAL_DIR)
 	$(MAKE) -C $(ROOTDIR) clean
 
 #clean: same as cleanall but without the amazon_avs removal
@@ -68,7 +70,7 @@ swig:
 
 help:
 	@echo "----------------------------------------------------------------------------------------"
-	@echo "| Microsemi AVS Kit software version 2.6.0                                             |"
+	@echo "| Microsemi AVS Kit software version 2.7.0                                             |"
 	@echo "----------------------------------------------------------------------------------------"
 	@echo "| SHELL="$(SHELL)
 	@echo "| ROOTDIR="$(ROOTDIR)

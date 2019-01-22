@@ -434,6 +434,7 @@ def GenerateFwFile(in_file, in_path, out_path, fw_opn, block_size):
 
 # ****************************************************************************
 # This function is designed to be called programmatically
+# Takes a file path as an input
 def GetFirmwareBinFile(in_path, fw_opn, block_size = 16):
 
     if not os.path.isfile(in_path):
@@ -443,6 +444,7 @@ def GetFirmwareBinFile(in_path, fw_opn, block_size = 16):
 
 # ****************************************************************************
 # This function is designed to be called programmatically
+# Takes a file buffer as an input
 def GetFirmwareBinFileB(in_file, fw_opn, block_size = 16):
 
     return GenerateFwFile(in_file, "", None, fw_opn, block_size)
@@ -550,6 +552,7 @@ def GenerateConfigFile(in_file, in_path, out_path, block_size):
 
 # ****************************************************************************
 # This function is designed to be called programmatically
+# Takes a file path as an input
 def GetConfigBinFile(in_path, block_size = 16):
 
     if not os.path.isfile(in_path):
@@ -559,6 +562,7 @@ def GetConfigBinFile(in_path, block_size = 16):
 
 # ****************************************************************************
 # This function is designed to be called programmatically
+# Takes a file buffer as an input
 def GetConfigBinFileB(in_file, block_size = 16):
 
     return GenerateConfigFile(in_file, "", None, block_size)
