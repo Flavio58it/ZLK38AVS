@@ -19,16 +19,14 @@ export MSCC_LOCAL_LIB_PATH =$(ROOTDIR)/libs
 # y specifies that it is a patched version of the x.z kernel.org version
 # example for kernel 4.9.y x=4 and z=9  , so the kernel name is rpi-4.9.y
 #-------------------------------------------------
-KSRC_TARBALL_NAME =rpi-4.11.y
-KSRC_TARBALL_PATH :=https://github.com/raspberrypi/linux/tarball/$(KSRC_TARBALL_NAME)
+KSRC_TARBALL_NAME =rpi-4.14.y
+KSRC_TARBALL_PATH :=https://github.com/raspberrypi/linux/archive/$(KSRC_TARBALL_NAME).tar.gz
 export KSRC_LINUX_PATH :=~/linux
-KSRC_GIT_PATH = https://github.com/raspberrypi/linux.git
 KERNEL=kernel7
 HOST_KERNEL_IMAGE_PATH :=/boot/$(KERNEL).img
 
 export platformUser :=`id -un`
 export platformGroup :=`id -gn`
-
 
 AMAZON_AVS_ONLINE_REPOSITORY =https://github.com/alexa/avs-device-sdk
 SENSORY_ALEXA_ONLINE_REPOSITORY =https://github.com/Sensory/alexa-rpi
@@ -101,7 +99,7 @@ pi_ksrc:
 	@if [ ! -d $(KSRC_LINUX_PATH) ]; then \
 	    wget $(KSRC_TARBALL_PATH); \
 	    mkdir  $(KSRC_LINUX_PATH); \
-	    sudo chmod 777 $(KSRC_LINUX_PATH); tar -xzvf $(KSRC_TARBALL_NAME) -C $(KSRC_LINUX_PATH) --strip-components 1; \
+	    sudo chmod 777 $(KSRC_LINUX_PATH); tar -xzvf $(KSRC_TARBALL_NAME).tar.gz -C $(KSRC_LINUX_PATH) --strip-components 1; \
 	fi
 	sudo apt-get update
 	sudo apt-get install bc
@@ -195,9 +193,17 @@ disable_autostart:
 	@if [ -f $(ROOTDIR)/../\.start.sh ]; then \
 	    rm $(ROOTDIR)/../\.start.sh; \
 	fi
-	@if [ -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup ]; then \
-	    cp $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart; \
-	    rm $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup; \
+# The autostart file moved in Raspberry Pi reference 2018-04-18
+	@if [ -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart ]; then \
+	    if [ -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup ]; then \
+	        cp $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart; \
+	        rm $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup; \
+	    fi; \
+	else \
+	    if [ -f /etc/xdg/lxsession/LXDE-pi/autostart.backup ]; then \
+	        sudo cp /etc/xdg/lxsession/LXDE-pi/autostart.backup /etc/xdg/lxsession/LXDE-pi/autostart; \
+	        sudo rm /etc/xdg/lxsession/LXDE-pi/autostart.backup; \
+	    fi; \
 	fi
 
 cleansnd_sub:
@@ -300,9 +306,16 @@ enable_autostart:
 	    echo "sleep 2" >> $(ROOTDIR)/../.start.sh; \
 	fi
 	@sudo chmod +x $(ROOTDIR)/../\.start.sh
-	@if [ ! -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup ]; then \
-	    cp $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup; \
-	    echo "@lxterminal -e $(ROOTDIR)/../.start.sh" >> $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart; \
+	@if [ -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart ]; then \
+	    if [ ! -f $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup ]; then \
+	        cp $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart.backup; \
+	        echo "@lxterminal -e $(ROOTDIR)/../.start.sh" >> $(HOST_USER_HOME_DIR)/\.config/lxsession/LXDE-pi/autostart; \
+	    fi; \
+	else \
+	    if [ ! -f /etc/xdg/lxsession/LXDE-pi/autostart.backup ]; then \
+	        sudo cp /etc/xdg/lxsession/LXDE-pi/autostart /etc/xdg/lxsession/LXDE-pi/autostart.backup; \
+	        echo "@lxterminal -e $(ROOTDIR)/../.start.sh" | sudo tee -a /etc/xdg/lxsession/LXDE-pi/autostart; \
+	    fi; \
 	fi
 
 set_serial:
