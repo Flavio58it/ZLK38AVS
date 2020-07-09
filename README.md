@@ -1,7 +1,9 @@
 # **Microchip Timberwolf™ Development Kit**   
 
-Microchip’s EV08Z13A evaluation board features Microchip’s Timberwolf audio processor, capable of running the full family of Timberwolf technology firmware. The EV08Z13A is designed to help developers quickly prototype and demonstrate high-quality audio processing algorithms such as full-duplex stereo echo cancellation, beamforming, noise reduction, dynamic range control, audio event detection etc.,
+Microchip’s EV08Z13A evaluation board features Microchip’s Timberwolf audio processor, capable of running the full family of Timberwolf technology firmware. The EV08Z13A is designed to help developers quickly prototype and demonstrate high-quality audio processing algorithms such as full-duplex stereo echo cancellation, beamforming, noise reduction, dynamic range control, audio event detection etc.
+
 The EV08Z13A evaluation board can be used to easily demonstrate algorithms for 2-way voice communication, embedded speech recognition, and audio event detection applications by using the Timberwolf Demo Tool software. Once ready for application-specific customization, the EV08Z13A can be configured and tuned with the Microchip MiTuner GUI software.
+
 The EV08Z13A board interfaced with a Raspberry Pi 3 serves as an Amazon Alexa Voice Services reference solution for creating products with Alexa built-in. The ZLS38063 firmware for Amazon AVS is far-field capable for 2-mic and 3-mic (linear, triangular), and hands-free capable for 1-mic.
 
 ## EV08Z13A Development Kit Features
