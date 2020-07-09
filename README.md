@@ -1,31 +1,70 @@
-# **Microsemi AcuEdge™ Development Kit for Amazon AVS**   
-Engineered to help you evaluate voice-enabled front-end audio systems for your Alexa-enabled products. This development kit features Microsemi's ZL38063 voice processor powered by the company's proprietary AcuEdge™ technology for front-end audio clean-up and preloaded “Alexa” wake-word detection. The kit includes a three microphone configuration that has been tested for both 180° and 360° pick-up.
+# **Microchip Timberwolf™ Development Kit**   
 
-## ZLK38AVS2 Kit Contents
-- Board ZLE38AVS rev. 4.01
-- Raspberry Pi 3 rev. B
-- JBL Clip 2 portable speaker
-- 2A micro USB power supply
-- Micro SD card
-- Pillar hardware kit
-- Assembly hardware
+Microchip’s EV08Z13A evaluation board features Microchip’s Timberwolf audio processor, capable of running the full family of Timberwolf technology firmware. The EV08Z13A is designed to help developers quickly prototype and demonstrate high-quality audio processing algorithms such as full-duplex stereo echo cancellation, beamforming, noise reduction, dynamic range control, audio event detection etc.,
+The EV08Z13A evaluation board can be used to easily demonstrate algorithms for 2-way voice communication, embedded speech recognition, and audio event detection applications by using the Timberwolf Demo Tool software. Once ready for application-specific customization, the EV08Z13A can be configured and tuned with the Microchip MiTuner GUI software.
+The EV08Z13A board interfaced with a Raspberry Pi 3 serves as an Amazon Alexa Voice Services reference solution for creating products with Alexa built-in. The ZLS38063 firmware for Amazon AVS is far-field capable for 2-mic and 3-mic (linear, triangular), and hands-free capable for 1-mic.
 
-## Timberwolf™ ZL38063 Audio Processor
-- Supports 1, 2 or 3 microphones linear or triangular array placement for enhanced audio pick up
-- Audio barge-in
-- Supports 360° sound location estimation
-- Noise reduction
-- Smart automatic gain control (AGC)
-- Two way communication
+## EV08Z13A Development Kit Features
+-	Timberwolf Audio DSP 
+-	Four on-board digital MEMS Microphones in recommended array geometries.
+-	Headphone/Speaker Output Jack
+-	I2S Port A Header
+-	USB Receptacle
+-	Power
+-	Audio via USB to I2S Port B bridge
+-	UART Debug Headers for interfacing with MiTuner and Demo Tool
+-	Raspberry Pi 3B 40-pin Header
+-	On-Board Flash Memory
+-	I2C LED Controller with 12 RGB LEDs
 
-## Microsemi Differentiators
-Designed for world-class voice front-end applications, Microsemi’s new ZL38063 audio processor features the company’s AcuEdge™ technology. This innovative technology is a set of highly-complex and integrated algorithms that significantly improves automatic speech recognition (ASR) for both embedded and cloud-based ASR solutions. The ZL38063 delivers audio enhancements that perform noise reduction and smart automatic gain control (AGC), enabling speech recognition at distance in noisy, real-world conditions.   
-![Microsemi AVS features](../../wiki/pictures/Microsemi-algorithm-differentiators-Amazon-Alexa-kit.png)
+Kit also includes:
+-	miniUSB Cable for Power & Audio
+-	USB-to-TTL Serial (FTDI) Cable for UART
 
-## Supporting the Amazon AVS Ecosystem
-Developers can use Microsemi's Amazon Alexa development kit to build customer solutions for Internet of Things (IoT), smart home and industrial applications.   
-![Microsemi AVS ecosystem](../../wiki/pictures/Microsemi-audio-processing-applications-infographic.png)
+## EV08Z13A Development Kit Benefits
+-	Demonstrate full family of Timberwolf Products (along with Timberwolf Demo Tool Software)
+-	Evaluate, prototype, debug and tune with single platform. (along with MiTuner GUI Software)
+-	Supports all recommended microphone array geometries with on-board MEMS microphones.
+-	USB – I2S bridge is configured to be a plug-and-play bi-directional audio interface between Timberwolf DSP and PC.
+-	Fully funct	ional Amazon AVS Far-Field Reference Solution when interfaced with a Raspberry Pi 3 (along with Amazon AVS Software)  
+-	Additional mic, DAC, and GPIO options with JMMA1 Header
 
-## Important considerations
-Check the wiki for the [hardware assembly](../../wiki/Hardware_Assembly) and the [software installation](../../wiki/Software_Installation)   
-_Note: The Amazon authentication has changed, make sure to use the proper **Client ID**_
+# Ready to Get Started?
+
+## Step 1: Order Board 
+[Order the EV08Z13A development board](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/EV08Z13A). Once you have purchased your board, follow the remainder of these steps to get started with evaluating the Microchip Timberwolf Audio Processor.  
+
+## Step 2: Software Setup
+-	Download the Timberwolf Demo Tool Package on to a Windows PC, and unzip to a known location.
+-	Install the included FTDI Driver by running CDM21228_Setup.exe.
+-	Install Timberwolf Demo Tool Setup.exe 
+-	For Windows 7/8 users, install the included Timberwolf Virtual COM Port driver by right-clicking twusbcom.inf and clicking Install.
+-	Restart your PC. 
+
+## Step 3: Hardware Setup
+-	Connect the EV08Z13A Development Board to your Windows PC using the included mini USB cable. Ensure that red POWER LED is solid ON indicating USB power. This mini USB connection also enables USB Audio connectivity between the Board and the PC. 
+-	Connect the JAIB1 header to the PC using the included USB-to-TTL cable as shown in the following picture. 
+ 
+The EV08Z13A has a standard 3.5mm audio jack for headphone or speaker output. Any pair of headphones and speakers will be required to evaluate many of the Timberwolf Demos. The audio output device should have minimal processing for the demos to run properly. 
+
+## Step 4: Run Timberwolf Demos 
+Start the Timberwolf Demo Tool. Choose the part number and demo to load firmware image, and speaker output setup. 
+  
+## Step 5: Evaluate Amazon AVS
+Optionally, to evaluate Amazon Alexa Voice Service (AVS) applications, the EV08Z13A board may be interfaced with a Raspberry Pi. Additional software and hardware is required to evaluate this solution. 
+Supporting the Amazon AVS Ecosystem
+
+Developers can use Microchip's Amazon Alexa development kit to build customer solutions for Internet of Things (IoT), smart home and industrial applications.
+ 
+## Getting Started with Timbewolf & Amazon AVS 
+
+## Step 1: Order Board 
+[Order the EV08Z13A development board](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/EV08Z13A). Once you have purchased your board, follow the remainder of these steps to get started with evaluating the Timberwolf Audio Processor. 
+
+## Step 2: [Hardware Assembly](../../wiki/Hardware_Assembly)
+
+## Step 3: [Software Installation](../../wiki/Software_Installation)
+
+Note: The Amazon authentication has changed, make sure to use the proper Client ID
+
+For Quick Troubleshooting & Support, submit a case [here](https://microchipsupport.force.com/s/article/How-to-submit-a-case). 
