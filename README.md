@@ -57,7 +57,8 @@ Start the Timberwolf Demo Tool. Choose the part number and demo to load firmware
 ![image](https://user-images.githubusercontent.com/26750703/86989991-3d245080-c161-11ea-96a8-78c4ea549681.png)
 
 ![image](https://user-images.githubusercontent.com/26750703/86990003-41e90480-c161-11ea-8ab7-15acfc8900fe.png)
-  
+
+---  
 ## Step 5: Evaluate Amazon AVS
 Optionally, to evaluate Amazon Alexa Voice Service (AVS) applications, the EV08Z13A board may be interfaced with a Raspberry Pi. Additional software and hardware is required to evaluate this solution. 
 Supporting the Amazon AVS Ecosystem
@@ -66,15 +67,10 @@ Developers can use Microchip's Amazon Alexa development kit to build customer so
 
 ![image](https://user-images.githubusercontent.com/26750703/86990202-a99f4f80-c161-11ea-943a-212e7fe0cb66.png)
 
-## Getting Started with Timbewolf & Amazon AVS 
+## [Hardware Assembly](../../wiki/Hardware_Assembly)
 
-## Step 1: Order Board 
-[Order the EV08Z13A development board](https://www.microchip.com/DevelopmentTools/ProductDetails/PartNO/EV08Z13A). Once you have purchased your board, follow the remainder of these steps to get started with evaluating the Timberwolf Audio Processor. 
-
-## Step 2: [Hardware Assembly](../../wiki/Hardware_Assembly)
-
-## Step 3: [Software Installation](../../wiki/Software_Installation)
+## [Software Installation](../../wiki/Software_Installation)
 
 Note: The Amazon authentication has changed, make sure to use the proper Client ID
-
+---
 For Quick Troubleshooting & Support, submit a case [here](https://microchipsupport.force.com/s/article/How-to-submit-a-case). 
