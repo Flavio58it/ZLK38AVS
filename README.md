@@ -44,18 +44,26 @@ Kit also includes:
 ## Step 3: Hardware Setup
 -	Connect the EV08Z13A Development Board to your Windows PC using the included mini USB cable. Ensure that red POWER LED is solid ON indicating USB power. This mini USB connection also enables USB Audio connectivity between the Board and the PC. 
 -	Connect the JAIB1 header to the PC using the included USB-to-TTL cable as shown in the following picture. 
+
+![image](https://user-images.githubusercontent.com/26750703/86989971-339ae880-c161-11ea-9c91-9a89fdc5a100.png)
  
 The EV08Z13A has a standard 3.5mm audio jack for headphone or speaker output. Any pair of headphones and speakers will be required to evaluate many of the Timberwolf Demos. The audio output device should have minimal processing for the demos to run properly. 
 
 ## Step 4: Run Timberwolf Demos 
 Start the Timberwolf Demo Tool. Choose the part number and demo to load firmware image, and speaker output setup. 
+
+![image](https://user-images.githubusercontent.com/26750703/86989991-3d245080-c161-11ea-96a8-78c4ea549681.png)
+
+![image](https://user-images.githubusercontent.com/26750703/86990003-41e90480-c161-11ea-8ab7-15acfc8900fe.png)
   
 ## Step 5: Evaluate Amazon AVS
 Optionally, to evaluate Amazon Alexa Voice Service (AVS) applications, the EV08Z13A board may be interfaced with a Raspberry Pi. Additional software and hardware is required to evaluate this solution. 
 Supporting the Amazon AVS Ecosystem
 
 Developers can use Microchip's Amazon Alexa development kit to build customer solutions for Internet of Things (IoT), smart home and industrial applications.
- 
+
+![image](https://user-images.githubusercontent.com/26750703/86990202-a99f4f80-c161-11ea-943a-212e7fe0cb66.png)
+
 ## Getting Started with Timbewolf & Amazon AVS 
 
 ## Step 1: Order Board 
